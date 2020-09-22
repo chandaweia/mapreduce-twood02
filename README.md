@@ -89,3 +89,6 @@ Got a list of files [pg-being_ernest.txt pg-dorian_gray.txt pg-frankenstein.txt 
 ```
 
 If you get errors about loading plugins in the worker process, then you probably modified a file in `mr/` and didn't recompile!
+
+## Next Steps
+One approach to solving the assignment is to proceed from this point and make it so that the worker will fully run the map and reduce functions on all of the input files. You have this code already in `mrsequential.go`.  This would give you a basic version of Map Reduce that only supports a single Worker.  To get full credit you will of course have to further break the system down so that multiple workers can handle map or reduce tasks in parallel.
