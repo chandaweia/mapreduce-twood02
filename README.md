@@ -3,8 +3,7 @@
 ## Setting up EC2 Environment
 
  - Start a new VM with RedHat Enterprise Linux 8
-    - We don't suggest using Ubuntu since it comes with an outdated version of Go.
-    - Check the lecture video for details! 
+    - We don't suggest using Ubuntu 18.04 since it comes with an outdated version of Go.
     - Be sure to save your keypair!
  - Setup an Elastic IP for your VM so that its IP won't change each time you reboot it 
     - Follow these instructions: https://aws.amazon.com/premiumsupport/knowledge-center/ec2-associate-static-public-ip/
@@ -17,19 +16,55 @@
 Host distSysVM
     HostName XXX.XXX.XXX.XXX
     IdentityFile ~/.ssh/dist-sys-test.pem
-    User ubuntu
+    User ec2-user
+    # or User ubuntu if using Ubuntu 20
 ```
 
- - If you have VS Code liveshare extension setup it will give you an error about not being able to install a script to allow browser links. To fix the error run the following in a terminal on your VM:
+Use the terminal in VS Code to complete the following setup steps:
 
- ```
-wget -O ~/vsls-reqs https://aka.ms/vsls-linux-prereq-script && chmod +x ~/vsls-reqs
-sudo vsls-reqs
- ```
 
- ## Update Go
- If you run `go version` it will show an outdated version of Go. We want at least version 1.13.
+### Install go / dev tools
+
+On RedHat we can install Go and lots of other languages/tools using:
 
 ```
-wget https://golang.org/dl/go1.15.2.linux-amd64.tar.gz
-sudo tar -C /usr/local -xzf go1.15.2.linux-amd64.tar.gz
+sudo yum groupinstall -y 'Development Tools'
+sudo yum install -y go 
+```
+
+Be sure to configure your GOPATH settings as suggested in the HW2 docs.
+
+### Clone your repo:
+
+Now you can get your repo and use Open Folder in VS Code to display it in your workspace:
+
+```
+git clone clone https://github.com/gwDistSys20/YOUR_REPO_URL
+```
+
+### Test VS Code Go integrations
+Open a file like `src/main/mrmaster.go` so VS Code will ask you to install the Go Analysis tools. Once the tools are installed you should be able to navigate the codebase easily, such as right clicking on `mr.MakeMaster(...)` and selecting Go To Definition.
+
+> **WARNING:** Since your `$GOPATH` is the root of your repo, VS Code might install the packages for all of the analysis tools into your workspace! Be careful not to commit all of these files to your repository.  You should setup a `.gitignore` file to appropriately ignore all of these packages and other temporary files produced by running the code.
+
+## Test the sequential Map Reduce
+
+```
+cd hw2-mapreduce-your-team-name
+source ./setEnv.sh
+cd src/main
+go build -buildmode=plugin ../mrapps/wc.go
+rm mr-out*
+go run mrsequential.go wc.so pg*.txt
+head mr-out-0
+
+# should give output like:
+A 509
+ABOUT 2
+ACT 8
+...
+```
+
+## Test the Master and Worker
+
+...
