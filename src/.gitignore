@@ -2,3 +2,5 @@
 mrtmp.*
 /main/diff.out
 /mapreduce/x.txt
+/bin/**
+/pkg/**

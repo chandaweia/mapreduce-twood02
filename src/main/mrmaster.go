@@ -7,10 +7,12 @@ package main
 // go run mrmaster.go pg*.txt
 //
 
-import "mr"
-import "time"
-import "os"
-import "fmt"
+import (
+	"fmt"
+	"mr"
+	"os"
+	"time"
+)
 
 func main() {
 	if len(os.Args) < 2 {
@@ -18,8 +20,10 @@ func main() {
 		os.Exit(1)
 	}
 
+	mr.DPrintf("Starting the master...\n")
 	m := mr.MakeMaster(os.Args[1:], 10)
 	for m.Done() == false {
+		mr.DPrintf("Sleeping...\n")
 		time.Sleep(time.Second)
 	}
 

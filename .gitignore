@@ -1,0 +1,9 @@
+bin/
+pkg/
+*.so
+src/main/mr-tmp/mr-wc-all
+src/main/mr-tmp/mr-correct-wc.txt
+src/main/mr-out-0
+src/main/mrsequential
+src/main/mrworker
+src/main/mrmaster

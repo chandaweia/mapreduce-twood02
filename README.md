@@ -66,5 +66,26 @@ ACT 8
 ```
 
 ## Test the Master and Worker
+To test that the master and worker are running correctly, we can start them in two separate terminals.
 
-...
+The code in this repository has been modified so that the master will start its RPC server and the worker will  issue two RPC requests. First it will use the simple Example RPC, and then it will register itself as a worker and get back a list of all the files that need to be processed.
+
+```
+# Terminal 1 -- start first
+source setenv.sh
+cd src/main
+go build -buildmode=plugin ../mrapps/wc.go
+go run mrmaster.go pg*.txt
+
+# Terminal 2 -- start after master
+source setenv.sh
+cd src/main
+go run mrworker.go wc.so
+
+# worker output:
+reply.Y 100
+Got a list of files [pg-being_ernest.txt pg-dorian_gray.txt pg-frankenstein.txt pg-grimm.txt pg-huckleberry_finn.txt pg-metamorphosis.txt pg-sherlock_holmes.txt pg-tom_sawyer.txt]
+
+```
+
+If you get errors about loading plugins in the worker process, then you probably modified a file in `mr/` and didn't recompile!

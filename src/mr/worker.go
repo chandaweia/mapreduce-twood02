@@ -1,10 +1,11 @@
 package mr
 
-import "fmt"
-import "log"
-import "net/rpc"
-import "hash/fnv"
-
+import (
+	"fmt"
+	"hash/fnv"
+	"log"
+	"net/rpc"
+)
 
 //
 // Map functions return a slice of KeyValue.
@@ -24,14 +25,29 @@ func ihash(key string) int {
 	return int(h.Sum32() & 0x7fffffff)
 }
 
-
 func Worker(mapf func(string, string) []KeyValue,
 	reducef func(string, []string) string) {
 
 	// Your worker implementation here.
 
 	// uncomment to send the Example RPC to the master.
-	// CallExample()
+	CallExample()
+
+	RegWorker()
+
+}
+
+// RegWorker will request the list of all files to be processed
+// from the master. Our super simple solution will process them
+// all sequentially on a single worker.
+func RegWorker() {
+	args := RegisterWorkerArgs{}
+	reply := RegisterWorkerReply{}
+
+	// send the RPC request, wait for the reply.
+	call("Master.RegisterWorker", &args, &reply)
+
+	DPrintf("Got a list of files %v\n", reply.InputFiles)
 
 }
 
@@ -53,7 +69,7 @@ func CallExample() {
 	call("Master.Example", &args, &reply)
 
 	// reply.Y should be 100.
-	fmt.Printf("reply.Y %v\n", reply.Y)
+	DPrintf("reply.Y %v\n", reply.Y)
 }
 
 //
