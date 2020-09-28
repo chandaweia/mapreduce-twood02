@@ -92,3 +92,17 @@ If you get errors about loading plugins in the worker process, then you probably
 
 ## Next Steps
 One approach to solving the assignment is to proceed from this point and make it so that the worker will fully run the map and reduce functions on all of the input files. You have this code already in `mrsequential.go`.  This would give you a basic version of Map Reduce that only supports a single Worker.  To get full credit you will of course have to further break the system down so that multiple workers can handle map or reduce tasks in parallel.
+
+# FAQ
+
+How many intermediate files will be generated?
+
+> Say for word-count test counting words in 8 files, and `nReduce` is 10, then there will be 8 map tasks (or more) and each task will split its results into 10 output files, thus there will be 80 files produced during the map phase. A reasonable naming convention for intermediate files is `mr-X-Y`, where X is the Map task number, and Y is the reduce task number. A reduce task will read from all its assigned intermediate files, and after the task is done, 1 file will be generated. Thus will be 10 files (`mr-out-reduceTaskId`) after all reduce tasks are finished. 
+
+When I run my worker, why do I get an error like `2020/09/28 00:03:01 cannot load plugin wc.so`?
+
+> The plugins include the `mr` package, so if you make any modifications to the files in that directory after running the compilation command, go will refuse to load the plugin (because the plugin has a different version of the `mr` package baked inside of it). If it allowed the program to proceed you could get strange runtime bugs!
+>
+> To help debug these issues we suggest modifying the line in the error checks after plugin loading to be
+`log.Fatalf("cannot load plugin %v Error: %v", filename, err)`
+> This will display the error and make it more obvious what the issue was.
