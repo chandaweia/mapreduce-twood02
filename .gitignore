@@ -7,3 +7,4 @@ src/main/mr-out-0
 src/main/mrsequential
 src/main/mrworker
 src/main/mrmaster
+.cache/

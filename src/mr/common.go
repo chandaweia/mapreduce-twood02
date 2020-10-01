@@ -9,12 +9,15 @@ import (
 	"fmt"
 	"strconv"
 )
+
 type Task struct {
 	//@TODO Your definitions here.
+	inputFiles []string
 }
 
 // jobPhase indicates whether a task is scheduled as a map or reduce task.
 type JobPhase int
+
 const (
 	MapPhase    JobPhase = 0
 	ReducePhase JobPhase = 1
@@ -32,7 +35,6 @@ func DPrintf(format string, a ...interface{}) (n int, err error) {
 	}
 	return
 }
-
 
 // reduceName constructs the name of the intermediate file which map task
 // <mapTask> produces for reduce task <reduceTask>.

@@ -20,20 +20,27 @@ type ExampleReply struct {
 type RegisterWorkerArgs struct {
 }
 
+// RegisterWorkerReply tells the client how many workers are currently online
 type RegisterWorkerReply struct {
-	InputFiles []string
+	NumWorkers int
 }
 
 type RequestTaskArgs struct {
 }
 
+// RequestTaskReply returns a list of files to be processed
+// TODO: only send one small task to do instead of all files
 type RequestTaskReply struct {
+	InputFiles []string
 }
 
 type ReportTaskArgs struct {
+	CompletedFiles []string
+	WorkerID       int
 }
 
 type ReportTaskReply struct {
+	MoreTasks bool
 }
 
 // Add your RPC definitions here.

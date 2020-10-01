@@ -6,11 +6,16 @@ import (
 	"net/http"
 	"net/rpc"
 	"os"
+	"sync"
 )
 
 type Master struct {
 	// Your definitions here.
 	inputFiles []string
+	numWorkers int
+	isDone     bool
+	sentTasks  bool
+	lock       sync.Mutex
 }
 
 // Your code here -- RPC handlers for the worker to call.
@@ -44,23 +49,38 @@ func (m *Master) server() {
 // if the entire job has finished.
 //
 func (m *Master) Done() bool {
-	ret := false
 
-	// Your code here.
-
-	return ret
+	return m.isDone
 }
 
 //RegisterWorker is an RPC method that is called by workers after they have started
 // up to report that they are ready to receive tasks.
 func (m *Master) RegisterWorker(args *RegisterWorkerArgs, reply *RegisterWorkerReply) error {
-	reply.InputFiles = m.inputFiles
-	DPrintf("Sending file list: %v\n", reply.InputFiles)
+	m.lock.Lock()
+	defer m.lock.Unlock()
+
+	m.numWorkers++
+	reply.NumWorkers = m.numWorkers
+	DPrintf("Registered worker %d\n", m.numWorkers)
+
 	return nil
 }
 
 //RequestTask is an RPC method that is called by workers to request a map or reduce task
 func (m *Master) RequestTask(args *RequestTaskArgs, reply *RequestTaskReply) error {
+
+	m.lock.Lock()
+	defer m.lock.Unlock()
+
+	if m.sentTasks == false {
+		reply.InputFiles = m.inputFiles
+		DPrintf("Sending file list: %v\n", reply.InputFiles)
+		m.sentTasks = true
+	} else {
+		reply.InputFiles = nil
+		DPrintf("Already sent files to be processed\n")
+	}
+
 	return nil
 }
 
@@ -68,6 +88,10 @@ func (m *Master) RequestTask(args *RequestTaskArgs, reply *RequestTaskReply) err
 //whenever a task is finished or failed
 //HINT: when a task is failed, master should reschedule it.
 func (m *Master) ReportTask(args *ReportTaskArgs, reply *ReportTaskReply) error {
+	DPrintf("Worker %d finished files %v", args.WorkerID, args.CompletedFiles)
+	// TODO: Check if there are more tasks to be processed!
+	reply.MoreTasks = false
+	m.isDone = true
 	return nil
 }
 
@@ -78,6 +102,9 @@ func MakeMaster(files []string, nReduce int) *Master {
 	m := Master{}
 
 	m.inputFiles = files
+	m.numWorkers = 0
+	m.isDone = false
+	m.sentTasks = false
 
 	// Your code here.
 
